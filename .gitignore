@@ -1,0 +1,7 @@
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+.idea/
+summary_last_shown.txt

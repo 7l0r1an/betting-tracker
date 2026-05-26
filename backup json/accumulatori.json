@@ -1,0 +1,413 @@
+[
+    {
+        "matches": [
+            "CFR Cluj vs Rapid Bucuresti",
+            "Heracles Almelo vs SBV Excelsior",
+            "AFC Bournemouth vs Manchester United FC",
+            "Bayern Munchen vs Union Berlin",
+            "FC Koln vs Borussia Monchengladbach",
+            "Heidenheim vs Bayer Leverkusen",
+            "PEC Zwolle vs NAC Breda",
+            "NEC vs SC Heerenveen",
+            "Arsenal vs Man. City"
+        ],
+        "odds_list": [
+            1.77,
+            1.35,
+            1.6,
+            1.24,
+            1.43,
+            1.32,
+            1.35,
+            1.23,
+            1.51
+        ],
+        "stake": 5.0,
+        "result": "lose",
+        "match_results": [
+            "lose",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "FCSB vs UTA Arad",
+            "Bayern Munchen vs Union Berlin",
+            "FC Koln vs Borussia Monchengladbach",
+            "NEC vs SC Heerenveen",
+            "Newcastle United FC vs Sunderland AFC",
+            "FC Barcelona vs Rayo Vallecano de Madrid"
+        ],
+        "odds_list": [
+            1.52,
+            1.8,
+            1.63,
+            1.62,
+            1.62,
+            1.5
+        ],
+        "stake": 5.0,
+        "result": "lose",
+        "match_results": [
+            "win",
+            "lose",
+            "win",
+            null,
+            null,
+            "win"
+        ],
+        "match_types": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "FCSB vs UTA Arad",
+            "CFR Cluj vs Rapid Bucuresti",
+            "Csikszereda Miercurea Ciuc vs Farul",
+            "FC Arges vs U Cluj"
+        ],
+        "odds_list": [
+            1.43,
+            1.53,
+            1.51,
+            1.95
+        ],
+        "stake": 6.86,
+        "result": "lose",
+        "match_results": [
+            "lose",
+            "lose",
+            null,
+            null
+        ],
+        "match_types": [
+            null,
+            null,
+            null,
+            null
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "FCSB vs UTA Arad",
+            "Hannover vs Eintracht Braunschweig",
+            "AFC Bournemouth vs Manchester United FC",
+            "Heidenheim vs Bayer Leverkusen",
+            "Sport Lisboa e Benfica vs Vit\u00f3ria SC",
+            "Leeds United FC vs Brentford FC",
+            "Tottenham Hotspur FC vs Nottingham Forest FC",
+            "Telstar 1963 vs PSV",
+            "Real Madrid CF vs Club Atl\u00e9tico de Madrid"
+        ],
+        "odds_list": [
+            1.42,
+            1.35,
+            2.1,
+            1.6,
+            1.2,
+            1.48,
+            1.49,
+            1.3,
+            1.34
+        ],
+        "stake": 6.5,
+        "result": "lose",
+        "match_results": [
+            "win",
+            "win",
+            "lose",
+            "win",
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "Elche CF vs RCD Mallorca",
+            "Parma Calcio 1913 vs US Cremonese",
+            "1. FC Heidenheim 1846 vs Bayer 04 Leverkusen",
+            "FC Bayern M\u00fcnchen vs 1. FC Union Berlin",
+            "Watford vs Leicester",
+            "Lokomotiva Zagreb vs Dinamo Zagreb",
+            "AC Milan vs Torino FC",
+            "Borussia Dortmund vs Hamburger SV",
+            "Sparta Rotterdam vs FC Volendam",
+            "Juventus FC vs US Sassuolo Calcio"
+        ],
+        "odds_list": [
+            1.42,
+            1.46,
+            1.39,
+            1.83,
+            1.42,
+            1.72,
+            1.9,
+            1.6,
+            1.51,
+            1.75
+        ],
+        "stake": 2.0,
+        "result": "lose",
+        "match_results": [
+            "win",
+            "win",
+            "win",
+            "lose",
+            "lose",
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub",
+            "Peste/Sub"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "FC Bayern M\u00fcnchen vs 1. FC Union Berlin",
+            "York City vs Brackley Town",
+            "Sheffield United vs Wrexham",
+            "FC Arges vs U Cluj",
+            "Juventus FC vs US Sassuolo Calcio",
+            "Ceara vs Sao Bernardo",
+            "Orlando Magic vs LA Lakers",
+            "Nakashima vs Cilic (tenis)"
+        ],
+        "odds_list": [
+            1.92,
+            2.5,
+            2.3,
+            1.87,
+            1.85,
+            1.97,
+            1.9,
+            1.77
+        ],
+        "stake": 2.0,
+        "result": "lose",
+        "match_results": [
+            "lose",
+            "lose",
+            "win",
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            "BTTS",
+            "1X2",
+            "BTTS",
+            "Peste/Sub",
+            "Peste/Sub",
+            "1X2",
+            "1X2",
+            "Peste/Sub"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "Sheffield United vs Wrexham",
+            "Swansea vs Coventry"
+        ],
+        "odds_list": [
+            1.46,
+            2.5
+        ],
+        "stake": 10.0,
+        "result": "win",
+        "match_results": [
+            "win",
+            "win"
+        ],
+        "match_types": [
+            "BTTS",
+            "1X2"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "1. FC Heidenheim 1846 vs Bayer 04 Leverkusen",
+            "Borussia Dortmund vs Hamburger SV",
+            "Everton FC vs Chelsea FC"
+        ],
+        "odds_list": [
+            1.7,
+            1.4,
+            1.7
+        ],
+        "stake": 10.0,
+        "result": "lose",
+        "match_results": [
+            "win",
+            null,
+            "lose"
+        ],
+        "match_types": [
+            "1X2",
+            "1X2",
+            "1X2"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "1. FC Heidenheim 1846 vs Bayer 04 Leverkusen",
+            "Swansea vs Coventry",
+            "Everton FC vs Chelsea FC",
+            "RC Celta de Vigo vs Deportivo Alav\u00e9s",
+            "FC Alverca vs Sporting Clube de Portugal",
+            "ACF Fiorentina vs FC Internazionale Milano"
+        ],
+        "odds_list": [
+            1.85,
+            1.5,
+            2.5,
+            1.45,
+            1.55,
+            1.65
+        ],
+        "stake": 4.55,
+        "result": "lose",
+        "match_results": [
+            "win",
+            "win",
+            "lose",
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            "1X2",
+            "1X2",
+            "1X2",
+            "1X2",
+            "1X2",
+            "1X2"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "Juventus vs Sassuolo",
+            "Tottenham Hotspur FC vs Nottingham Forest FC",
+            "Real Madrid CF vs Club Atl\u00e9tico de Madrid",
+            "Sion vs St. Gallen"
+        ],
+        "odds_list": [
+            1.92,
+            1.52,
+            1.34,
+            1.53
+        ],
+        "stake": 10.0,
+        "result": null,
+        "match_results": [
+            null,
+            null,
+            null,
+            "win"
+        ],
+        "match_types": [
+            "Peste/Sub",
+            "BTTS",
+            "BTTS",
+            "BTTS"
+        ],
+        "date": "2026-03-21"
+    },
+    {
+        "matches": [
+            "Darmstadt vs Schalke",
+            "Juventus vs Sassuolo",
+            "Sevilla vs Valencia",
+            "Zwolle vs NAC Breda",
+            "Nice vs PSG",
+            "Sion vs St. Gallen"
+        ],
+        "odds_list": [
+            1.74,
+            1.54,
+            1.64,
+            1.58,
+            1.46,
+            1.56
+        ],
+        "stake": 10.0,
+        "result": null,
+        "match_results": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "match_types": [
+            "1X2",
+            "Peste/Sub",
+            "1X2",
+            "BTTS",
+            "1X2",
+            "BTTS"
+        ],
+        "date": "2026-03-21"
+    }
+]

@@ -1,0 +1,34 @@
+[
+    {
+        "match": "FCSB vs UTA Arad",
+        "stake": 10.0,
+        "odds": 6.5,
+        "result": "lose",
+        "bet_type": null,
+        "date": "2026-03-21"
+    },
+    {
+        "match": "CFR Cluj vs Rapid Bucuresti",
+        "stake": 10.0,
+        "odds": 3.4,
+        "result": "lose",
+        "bet_type": null,
+        "date": "2026-03-21"
+    },
+    {
+        "match": "Real Madrid CF vs Club Atl\u00e9tico de Madrid",
+        "stake": 12.5,
+        "odds": 4.6,
+        "result": "win",
+        "bet_type": "Peste/Sub",
+        "date": "2026-03-22"
+    },
+    {
+        "match": "Real Madrid vs Atletico",
+        "stake": 11.47,
+        "odds": 15.0,
+        "result": "lose",
+        "bet_type": "Peste/Sub",
+        "date": "2026-03-23"
+    }
+]
