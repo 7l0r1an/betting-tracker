@@ -3,10 +3,28 @@ from repository import file_repo
 from repository import accumulator_repo
 
 def show_profit_chart():
+    """
+    Ce face:
+        Deseneaza si afiseaza graficul evolutiei profitului cumulativ pe baza
+        pariurilor simple si a acumulatorilor finalizati. Zonele pozitive sunt
+        colorate verde, cele negative rosu.
+
+    Variabile:
+        bets: pariurile simple.
+        accumulators: acumulatorii.
+        finished_bets: pariurile simple finalizate.
+        finished_acc: acumulatorii finalizati.
+        profits: lista profitului cumulativ dupa fiecare intrare.
+        labels: etichetele afisate pe axa X.
+        cumulative: profitul acumulat pe parcurs.
+
+    Erori:
+        Daca nu exista intrari finalizate afiseaza un mesaj si iese fara grafic.
+        Propaga erorile matplotlib de afisare (ex: lipsa unui display).
+    """
     bets = file_repo.load_bets()
     accumulators = accumulator_repo.load_accumulators()
 
-    # combinam toate pariurile finalizate sortate
     finished_bets = [b for b in bets if b.result is not None]
     finished_acc = [a for a in accumulators if a.result is not None]
 
@@ -14,7 +32,6 @@ def show_profit_chart():
         print("Nu ai pariuri finalizate pentru grafic.")
         return
 
-    # calculam profitul cumulativ
     profits = []
     labels = []
     cumulative = 0
@@ -22,19 +39,17 @@ def show_profit_chart():
     for b in finished_bets:
         cumulative += b.profit
         profits.append(cumulative)
-        labels.append(b.match[:15])  # primele 15 caractere
+        labels.append(b.match[:15])
 
     for a in finished_acc:
         cumulative += a.profit
         profits.append(cumulative)
         labels.append("Acumulator")
 
-    # desenam graficul
     plt.figure(figsize=(12, 6))
     plt.plot(profits, marker="o", linewidth=2, color="green" if profits[-1] >= 0 else "red")
-    plt.axhline(y=0, color="gray", linestyle="--", linewidth=1)  # linie la 0
+    plt.axhline(y=0, color="gray", linestyle="--", linewidth=1)
 
-    # coloram zonele pozitive/negative
     plt.fill_between(range(len(profits)), profits, 0,
                      where=[p >= 0 for p in profits],
                      alpha=0.3, color="green", label="Profit")

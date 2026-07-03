@@ -1,6 +1,29 @@
 from repository.api_repo import get_recent_form_detailed, get_head_to_head, get_standings
 
 def predict_match(home_team_id, away_team_id, league_code):
+    """
+    Ce face:
+        Estimeaza probabilitatile de rezultat (victorie gazde / egal / victorie
+        oaspeti) pentru un meci, combinand forma recenta, pozitia in clasament si
+        istoricul direct (head to head). Returneaza un raport text detaliat.
+
+    Variabile:
+        home_team_id / away_team_id: id-urile echipelor.
+        league_code: codul ligii (pentru clasament).
+        home_form / away_form: forma recenta a fiecarei echipe.
+        h2h: meciurile directe recente.
+        standings: clasamentul ligii, indexat pe id de echipa.
+        home_score / away_score: scorurile de forta calculate.
+        pos_diff / bonus: diferenta de pozitie in clasament si bonusul aplicat gazdelor.
+        h2h_home_score / h2h_away_score: castigurile directe ale fiecarei echipe.
+        total / total_prob: sume folosite pentru normalizarea probabilitatilor.
+        home_prob / draw_prob / away_prob: probabilitatile finale normalizate.
+
+    Erori:
+        Daca lipseste forma pentru vreo echipa returneaza "Nu sunt suficiente date."
+        Clasamentul si h2h se aplica doar daca sunt disponibile. Propaga erorile
+        de retea/API din apelurile subiacente.
+    """
     home_form = get_recent_form_detailed(home_team_id)
     away_form = get_recent_form_detailed(away_team_id)
     h2h = get_head_to_head(home_team_id, away_team_id)
@@ -12,7 +35,6 @@ def predict_match(home_team_id, away_team_id, league_code):
     home_score, home_breakdown = calculate_score(home_form, is_home=True)
     away_score, away_breakdown = calculate_score(away_form, is_home=False)
 
-    # bonus/penalizare din clasament
     standing_breakdown = ""
     if home_team_id in standings and away_team_id in standings:
         home_pos = standings[home_team_id]["position"]
@@ -20,7 +42,7 @@ def predict_match(home_team_id, away_team_id, league_code):
         home_pts = standings[home_team_id]["points"]
         away_pts = standings[away_team_id]["points"]
 
-        pos_diff = away_pos - home_pos  # pozitiv = gazda e mai sus
+        pos_diff = away_pos - home_pos
         bonus = pos_diff * 0.3
         home_score += bonus
 
@@ -31,7 +53,6 @@ def predict_match(home_team_id, away_team_id, league_code):
             f"  Bonus gazde din clasament: {bonus:+.1f}\n"
         )
 
-    # head to head
     h2h_breakdown = "\n--- Head to Head ---\n"
     h2h_home_score = 0
     h2h_away_score = 0
@@ -83,6 +104,25 @@ def predict_match(home_team_id, away_team_id, league_code):
     )
 
 def calculate_score(form, is_home):
+    """
+    Ce face:
+        Calculeaza un scor de forta pentru o echipa pe baza formei recente
+        (puncte din rezultat, bonus goluri marcate, penalizare goluri primite) si
+        aplica un bonus de teren propriu pentru gazde. Returneaza (scor, breakdown).
+
+    Variabile:
+        form: lista de meciuri, fiecare cu "result", "goals_scored", "goals_conceded".
+        is_home: True daca echipa joaca acasa (aplica bonus x1.15).
+        score: scorul cumulat.
+        lines: liniile textului explicativ per meci.
+        match_score: scorul unui meci individual.
+        goals_bonus / goals_penalty: componentele din goluri.
+        breakdown: textul detaliat al calculului.
+
+    Erori:
+        Ridica KeyError daca un meci nu contine cheile asteptate. Scorul minim
+        returnat este 0.1 (nu poate fi 0 sau negativ).
+    """
     score = 0
     lines = []
 

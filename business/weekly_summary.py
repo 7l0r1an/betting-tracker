@@ -3,6 +3,19 @@ from repository import file_repo, accumulator_repo
 from repository.bank_repo import load_bank
 
 def get_last_week_range():
+    """
+    Ce face:
+        Calculeaza intervalul saptamanii trecute (luni 00:00:00 - duminica
+        23:59:59) raportat la data curenta.
+
+    Variabile:
+        today: data si ora curente.
+        last_monday: lunea saptamanii trecute.
+        last_sunday: duminica saptamanii trecute.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     today = datetime.now()
     last_monday = today - timedelta(days=today.weekday() + 7)
     last_sunday = last_monday + timedelta(days=6)
@@ -11,9 +24,30 @@ def get_last_week_range():
     return last_monday, last_sunday
 
 def is_monday():
+    """
+    Ce face:
+        Returneaza True daca ziua curenta este luni.
+
+    Variabile:
+        Fara parametri.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     return datetime.now().weekday() == 0
 
 def was_summary_shown_today():
+    """
+    Ce face:
+        Verifica daca rezumatul saptamanal a fost deja afisat astazi, comparand
+        data din fisierul de urmarire cu data curenta.
+
+    Variabile:
+        last: data ultimei afisari citita din fisier.
+
+    Erori:
+        Daca fisierul "summary_last_shown.txt" nu exista returneaza False.
+    """
     try:
         with open("summary_last_shown.txt", "r") as f:
             last = f.read().strip()
@@ -22,17 +56,46 @@ def was_summary_shown_today():
         return False
 
 def mark_summary_shown():
+    """
+    Ce face:
+        Marcheaza rezumatul ca afisat astazi, scriind data curenta in fisierul
+        de urmarire.
+
+    Variabile:
+        Fara parametri.
+
+    Erori:
+        Propaga erorile de I/O daca fisierul nu poate fi scris.
+    """
     with open("summary_last_shown.txt", "w") as f:
         f.write(datetime.now().strftime("%Y-%m-%d"))
 
 def get_weekly_summary():
+    """
+    Ce face:
+        Construieste rezumatul pariurilor si acumulatorilor finalizati (numar,
+        castiguri, win rate, profit, cel mai bun/rau pariu, evolutia bankului).
+        Nota: intrarile nu sunt filtrate strict pe saptamana (nu exista data
+        salvata per intrare), asa ca se iau toate cele finalizate.
+
+    Variabile:
+        start / end: intervalul saptamanii trecute (pentru afisare).
+        bets / accs: pariurile si acumulatorii.
+        finished_bets / finished_accs: intrarile finalizate.
+        all_finished: lista unificata a intrarilor finalizate.
+        total_profit / total_staked / wins / win_rate: agregatele.
+        best / worst: intrarea cu cel mai mare, respectiv cel mai mic profit.
+        buget_initial / buget_curent: bankul la inceput si dupa profit.
+
+    Erori:
+        Daca nu exista intrari finalizate returneaza None. Ridica KeyError daca
+        fisierul bank nu contine "buget_initial".
+    """
     start, end = get_last_week_range()
 
     bets = file_repo.load_bets()
     accs = accumulator_repo.load_accumulators()
 
-    # filtram pariurile din saptamana trecuta
-    # folosim indexul ca nu avem data salvata — luam toate finalizate
     finished_bets = [b for b in bets if b.result is not None]
     finished_accs = [a for a in accs if a.result is not None]
 

@@ -1,6 +1,16 @@
 from business import tracker
 
 def print_menu():
+    """
+    Ce face:
+        Afiseaza meniul principal al aplicatiei in consola.
+
+    Variabile:
+        Fara parametri.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     print("\n=== Betting Tracker ===")
     print("1. Adauga pariu")
     print("2. Vezi toate pariurile")
@@ -18,6 +28,18 @@ def print_menu():
     print("0. Iesire")
 
 def add_bet_ui():
+    """
+    Ce face:
+        Citeste de la tastatura datele unui pariu (meci, miza, cota) si il salveaza.
+
+    Variabile:
+        match: numele meciului.
+        stake: miza (convertita in float).
+        odds: cota (convertita in float).
+
+    Erori:
+        Ridica ValueError daca miza sau cota nu sunt numere valide.
+    """
     match = input("Meci: ")
     stake = float(input("Miza: "))
     odds = float(input("Cota: "))
@@ -25,6 +47,16 @@ def add_bet_ui():
     print("Pariu adaugat!")
 
 def view_bets_ui():
+    """
+    Ce face:
+        Afiseaza toate pariurile salvate, cu indexul lor.
+
+    Variabile:
+        bets: lista pariurilor.
+
+    Erori:
+        Daca nu exista pariuri afiseaza un mesaj si iese.
+    """
     bets = tracker.get_all_bets()
     if not bets:
         print("Fara pariuri salvate")
@@ -33,6 +65,17 @@ def view_bets_ui():
         print(f"{i}.{bet}")
 
 def update_result_ui():
+    """
+    Ce face:
+        Afiseaza pariurile si citeste indexul + rezultatul pentru a le actualiza.
+
+    Variabile:
+        index: indexul pariului (convertit in int).
+        result: rezultatul introdus (normalizat lowercase).
+
+    Erori:
+        Ridica ValueError daca indexul nu este un numar intreg valid.
+    """
     view_bets_ui()
     index = int(input("Index pariu:"))
     result = input("Rezultat: ").strip().lower()
@@ -40,6 +83,21 @@ def update_result_ui():
     print("Actualizat!")
 
 def view_upcoming_matches_ui():
+    """
+    Ce face:
+        Alege o liga, afiseaza meciurile viitoare si permite adaugarea unui pariu
+        pe un meci selectat.
+
+    Variabile:
+        leagues_list: lista (nume, cod) a ligilor.
+        choice: indexul ligii ales.
+        matches: meciurile viitoare returnate de API.
+        index / match_str / stake / odds: datele pariului nou (daca se adauga).
+
+    Erori:
+        Ridica ValueError la input nenumeric si IndexError la un index in afara
+        listei de ligi/meciuri. Propaga erorile de retea din API.
+    """
     from repository.api_repo import get_upcoming_matches, LEAGUES
     print("\nAlege liga: ")
     leagues_list = list(LEAGUES.items())
@@ -64,6 +122,22 @@ def view_upcoming_matches_ui():
         print("Pariu adaugat!")
 
 def value_bet_ui():
+    """
+    Ce face:
+        Citeste probabilitatea estimata, cota si miza, apoi afiseaza probabilitatea
+        implicita, value-ul si valoarea asteptata (EV), cu verdictul final.
+
+    Variabile:
+        your_prob: sansa estimata de castig (%).
+        bookmaker_odds: cota bookmakerului.
+        stake: miza.
+        implied: probabilitatea implicita a cotei.
+        value / is_value: diferenta de value si daca pariul are value.
+        ev: valoarea asteptata.
+
+    Erori:
+        Ridica ValueError la input nenumeric si ZeroDivisionError daca cota este 0.
+    """
     from business.calculator import odds_to_probability, has_value, expected_value
     print("\n=== Value Bet Calculator ===")
     your_prob = float(input("Sansa ta estimata ca echipa castiga (%): "))
@@ -85,6 +159,21 @@ def value_bet_ui():
         print("✗ Fara value - skip!")
 
 def add_accumulator_ui():
+    """
+    Ce face:
+        Citeste interactiv meciurile si cotele unui acumulator (minim 2 meciuri),
+        calculeaza cota totala si castigul potential, apoi salveaza dupa confirmare.
+
+    Variabile:
+        matches / odds_list: meciurile si cotele introduse.
+        stake: miza totala.
+        total_odds: cota totala calculata prin inmultirea cotelor.
+        confirm: raspunsul de confirmare (y/n).
+
+    Erori:
+        Ridica ValueError daca o cota sau miza nu este numar. Nu se poate incheia
+        cu mai putin de 2 meciuri.
+    """
     from business import accumulator_tracker
 
     matches = []
@@ -106,7 +195,6 @@ def add_accumulator_ui():
 
     stake = float(input("Miza totala (RON): "))
 
-    # calculeaza cota totala
     total_odds = 1
     for o in odds_list:
         total_odds *= o
@@ -121,6 +209,16 @@ def add_accumulator_ui():
         print("Acumulator adaugat!")
 
 def view_accumulators_ui():
+    """
+    Ce face:
+        Afiseaza toti acumulatorii salvati, cu indexul lor.
+
+    Variabile:
+        accumulators: lista acumulatorilor.
+
+    Erori:
+        Daca nu exista acumulatori afiseaza un mesaj si iese.
+    """
     from business import accumulator_tracker
 
     accumulators = accumulator_tracker.get_all()
@@ -132,6 +230,18 @@ def view_accumulators_ui():
         print(acc)
 
 def update_accumulator_result_ui():
+    """
+    Ce face:
+        Afiseaza acumulatorii si citeste indexul + rezultatul pentru a actualiza
+        rezultatul intregului acumulator.
+
+    Variabile:
+        index: indexul acumulatorului (int).
+        result: rezultatul introdus (win/lose).
+
+    Erori:
+        Ridica ValueError daca indexul nu este un numar intreg valid.
+    """
     from business import accumulator_tracker
 
     view_accumulators_ui()
@@ -141,6 +251,22 @@ def update_accumulator_result_ui():
     print("Rezultat actualizat!")
 
 def predict_match_ui():
+    """
+    Ce face:
+        Alege o liga, incarca echipele, cere indexii gazdei si oaspetelui si
+        afiseaza predictia meciului.
+
+    Variabile:
+        leagues_list: lista (nume, cod) a ligilor.
+        choice: indexul ligii ales.
+        teams: dictionarul {nume: id} al echipelor.
+        home_index / away_index: indexii echipelor alese.
+        home_id / away_id: id-urile echipelor.
+
+    Erori:
+        Ridica ValueError la input nenumeric si IndexError la un index invalid.
+        Propaga erorile de retea din API.
+    """
     from repository.api_repo import get_teams, LEAGUES
     from business.predictor import predict_match
 
@@ -169,10 +295,31 @@ def predict_match_ui():
     print(predict_match(home_id, away_id, code))
 
 def show_chart_ui():
+    """
+    Ce face:
+        Afiseaza graficul evolutiei profitului.
+
+    Variabile:
+        Fara parametri.
+
+    Erori:
+        Propaga erorile matplotlib de afisare.
+    """
     from business.chart import show_profit_chart
     show_profit_chart()
 
 def delete_bet_ui():
+    """
+    Ce face:
+        Afiseaza pariurile, cere indexul si sterge pariul dupa confirmare.
+
+    Variabile:
+        index: indexul pariului de sters (int).
+        confirm: raspunsul de confirmare (y/n).
+
+    Erori:
+        Ridica ValueError daca indexul nu este un numar intreg valid.
+    """
     view_bets_ui()
     index = int(input("Index pariu de sters: "))
     confirm = input("Esti sigur? (y/n): ").strip().lower()
@@ -181,6 +328,18 @@ def delete_bet_ui():
         print("Pariu sters!")
 
 def run():
+    """
+    Ce face:
+        Bucla principala a interfetei in consola: afiseaza meniul si dirijeaza
+        catre actiunea corespunzatoare optiunii alese, pana la iesire ("0").
+
+    Variabile:
+        choice: optiunea aleasa din meniu (text).
+
+    Erori:
+        Erorile din actiunile individuale (ex: ValueError la input) se propaga si
+        pot intrerupe bucla. O optiune necunoscuta afiseaza "Optiune invalida".
+    """
     while True:
         print_menu()
         choice = input("> ").strip()
