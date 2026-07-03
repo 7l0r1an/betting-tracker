@@ -1,6 +1,20 @@
 from repository.api_repo import get_match_stats_history
 
 def calculate_probabilities(values, thresholds):
+    """
+    Ce face:
+        Calculeaza, pentru fiecare prag, procentul de valori care il depasesc.
+        Returneaza un dictionar {"peste <prag>": procent}.
+
+    Variabile:
+        values: lista de valori numerice observate.
+        thresholds: lista de praguri de comparat.
+        result: dictionarul rezultat.
+        over: numarul de valori peste pragul curent.
+
+    Erori:
+        Daca values este gol returneaza un dictionar gol (evita impartirea la 0).
+    """
     if not values:
         return {}
     result = {}
@@ -10,6 +24,20 @@ def calculate_probabilities(values, thresholds):
     return result
 
 def get_team_stats(team_id, count=10):
+    """
+    Ce face:
+        Extrage istoricul recent al unei echipe si calculeaza mediile si
+        probabilitatile pentru goluri totale, goluri marcate si goluri primite.
+
+    Variabile:
+        team_id: id-ul echipei.
+        count: numarul de meciuri analizate (implicit 10).
+        stats: istoricul brut al meciurilor.
+        goals / scored / conceded: listele de valori extrase din istoric.
+
+    Erori:
+        Daca nu exista istoric returneaza None. Propaga erorile de retea/API.
+    """
     stats = get_match_stats_history(team_id, count)
     if not stats:
         return None
@@ -28,6 +56,20 @@ def get_team_stats(team_id, count=10):
     }
 
 def combine_stats(home_stats, away_stats):
+    """
+    Ce face:
+        Combina statisticile a doua echipe facand media pentru fiecare categorie
+        (goluri totale, marcate, primite) si pentru fiecare prag de probabilitate.
+
+    Variabile:
+        home_stats / away_stats: statisticile celor doua echipe.
+        combine: functie interna care mediaza media si probabilitatile a doua
+            categorii corespunzatoare.
+
+    Erori:
+        Ridica TypeError daca home_stats sau away_stats este None. Presupune ca
+        ambele au aceleasi chei si aceleasi praguri.
+    """
     def combine(h, a):
         avg = round((h["avg"] + a["avg"]) / 2, 2)
         probs = {}
@@ -42,6 +84,20 @@ def combine_stats(home_stats, away_stats):
     }
 
 def format_team_stats(stats, team_name):
+    """
+    Ce face:
+        Formateaza statisticile unei echipe intr-un text cu bare de progres pentru
+        goluri totale, marcate si primite.
+
+    Variabile:
+        stats: statisticile echipei (din get_team_stats).
+        team_name: numele echipei pentru afisare.
+        prob_bar: functie interna care deseneaza o bara text pentru un procent.
+        lines: liniile textului rezultat.
+
+    Erori:
+        Daca stats este None/gol returneaza un mesaj ca nu sunt date.
+    """
     if not stats:
         return f"Nu sunt date pentru {team_name}."
 
@@ -69,6 +125,20 @@ def format_team_stats(stats, team_name):
     return "\n".join(lines)
 
 def format_combined_stats(combined, home_name, away_name):
+    """
+    Ce face:
+        Formateaza statisticile combinate ale celor doua echipe intr-un text cu
+        bare de progres (goluri totale estimate, marcate si primite combinate).
+
+    Variabile:
+        combined: statisticile combinate (din combine_stats).
+        home_name / away_name: numele echipelor pentru titlu.
+        prob_bar: functie interna care deseneaza o bara text pentru un procent.
+        lines: liniile textului rezultat.
+
+    Erori:
+        Ridica KeyError daca structura combined nu contine cheile asteptate.
+    """
     def prob_bar(pct):
         filled = int(pct / 10)
         return f"[{'█' * filled}{'░' * (10 - filled)}] {pct}%"

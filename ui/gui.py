@@ -16,6 +16,22 @@ YELLOW      = "#ffa500"
 BORDER      = "#30363d"
 
 def styled_button(parent, text, command, color=ACCENT, text_color=BG, width=None):
+    """
+    Ce face:
+        Creeaza si returneaza un buton stilizat conform temei aplicatiei.
+
+    Variabile:
+        parent: widget-ul parinte.
+        text: textul afisat pe buton.
+        command: functia apelata la click.
+        color: culoarea de fundal.
+        text_color: culoarea textului.
+        width: latimea fixa (optional).
+        btn: butonul creat.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     btn = tk.Button(parent, text=text, command=command,
                     bg=color, fg=text_color, relief="flat",
                     font=("Consolas", 11, "bold"),
@@ -26,6 +42,17 @@ def styled_button(parent, text, command, color=ACCENT, text_color=BG, width=None
     return btn
 
 def styled_entry(parent, width=30):
+    """
+    Ce face:
+        Creeaza si returneaza un camp de input (Entry) stilizat conform temei.
+
+    Variabile:
+        parent: widget-ul parinte.
+        width: latimea campului (implicit 30).
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     return tk.Entry(parent, width=width, bg=CARD_BG, fg=TEXT,
                     insertbackground=ACCENT, relief="flat",
                     font=("Consolas", 12),
@@ -33,11 +60,40 @@ def styled_entry(parent, width=30):
                     highlightbackground=BORDER)
 
 def styled_label(parent, text, size=12, bold=False, color=TEXT, bg=None):
+    """
+    Ce face:
+        Creeaza si returneaza o eticheta (Label) stilizata conform temei.
+
+    Variabile:
+        parent: widget-ul parinte.
+        text: textul etichetei.
+        size: dimensiunea fontului (implicit 12).
+        bold: True pentru font bold.
+        color: culoarea textului.
+        bg: culoarea de fundal; daca lipseste se preia de la parinte.
+        font: tuplul de font construit.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     font = ("Consolas", size, "bold") if bold else ("Consolas", size)
     return tk.Label(parent, text=text, font=font, fg=color,
                     bg=bg or parent.cget("bg"))
 
 def section_title(parent, text):
+    """
+    Ce face:
+        Creeaza un titlu de sectiune (text accentuat urmat de o linie separatoare)
+        si returneaza frame-ul care il contine.
+
+    Variabile:
+        parent: widget-ul parinte.
+        text: textul titlului.
+        f: frame-ul returnat.
+
+    Erori:
+        Nu ridica erori proprii.
+    """
     f = tk.Frame(parent, bg=parent.cget("bg"))
     tk.Label(f, text=text, font=("Consolas", 14, "bold"),
              fg=ACCENT, bg=f.cget("bg")).pack(side="left")
@@ -47,6 +103,25 @@ def section_title(parent, text):
 
 class BettingApp:
     def __init__(self, root):
+        """
+        Ce face:
+            Initializeaza fereastra principala: seteaza titlul, dimensiunea, tema,
+            titlebar-ul custom (cu drag, minimizare, inchidere), construieste
+            layout-ul si afiseaza dashboard-ul. Lunea afiseaza rezumatul saptamanal
+            daca nu a fost deja aratat azi.
+
+        Variabile:
+            root: fereastra Tk radacina.
+            self.current_page: pagina curent afisata.
+            self.pages: dictionarul paginilor construite.
+            self._collapsed_accs: setul acumulatorilor pliati in lista.
+            titlebar: bara de titlu custom.
+            start_drag / do_drag: functii interne pentru mutarea ferestrei.
+
+        Erori:
+            Propaga erorile de la construirea layout-ului sau de la incarcarea
+            datelor pentru rezumatul saptamanal.
+        """
         self.root = root
         self.root.title("⚽ Betting Tracker Pro")
         self.root.geometry("1280x750")
@@ -58,7 +133,6 @@ class BettingApp:
         self.pages = {}
         self._collapsed_accs = set()
 
-        # custom titlebar
         titlebar = tk.Frame(self.root, bg="#0a0a0a", height=32)
         titlebar.pack(fill="x", side="top")
         titlebar.pack_propagate(False)
@@ -98,6 +172,22 @@ class BettingApp:
             self.root.after(1000, self.show_weekly_summary)
 
     def _build_layout(self):
+        """
+        Ce face:
+            Construieste layout-ul principal: sidebar-ul cu butoanele de navigare
+            si zona de continut cu cate un frame (pagina) pentru fiecare sectiune.
+
+        Variabile:
+            self.sidebar: frame-ul barei laterale.
+            self.nav_buttons: dictionarul butoanelor de navigare.
+            nav_items: perechile (cheie, eticheta) pentru navigare.
+            self.content: containerul paginilor.
+            self.pages: dictionarul frame-urilor de pagina.
+
+        Erori:
+            Apeleaza dinamic metodele build_<key>; o cheie fara metoda
+            corespondenta ar ridica AttributeError.
+        """
         self.sidebar = tk.Frame(self.root, bg=SIDEBAR_BG, width=200)
         self.sidebar.pack(side="left", fill="y")
         self.sidebar.pack_propagate(False)
@@ -141,6 +231,18 @@ class BettingApp:
             getattr(self, f"build_{key}")(page)
 
     def show_page(self, key):
+        """
+        Ce face:
+            Comuta pagina afisata: ascunde pagina curenta, afiseaza pagina ceruta
+            si actualizeaza starea vizuala a butoanelor de navigare.
+
+        Variabile:
+            key: cheia paginii de afisat.
+            self.current_page: pagina activa (actualizata la final).
+
+        Erori:
+            Ridica KeyError daca key nu exista in self.pages sau self.nav_buttons.
+        """
         if self.current_page:
             self.pages[self.current_page].pack_forget()
             self.nav_buttons[self.current_page].config(bg=SIDEBAR_BG, fg=TEXT_MUTED)
@@ -150,6 +252,21 @@ class BettingApp:
 
     # ── DASHBOARD ───────────────────────────────────────────────
     def build_dashboard(self, frame):
+        """
+        Ce face:
+            Construieste pagina Dashboard: cardurile cu statistici (pariuri simple,
+            acumulatori, profit, win rate, ROI) si lista pariurilor recente.
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.stat_labels: etichetele valorilor statistice, pe cheie.
+            stats: definitiile cardurilor (titlu, cheie, culoare).
+            self.recent_listbox: lista pariurilor recente.
+
+        Erori:
+            La final apeleaza refresh_dashboard, care poate propaga erori de
+            incarcare a datelor.
+        """
         header = tk.Frame(frame, bg=BG)
         header.pack(fill="x", padx=30, pady=(25, 10))
         styled_label(header, "Dashboard", 20, bold=True, color=TEXT).pack(side="left")
@@ -194,6 +311,20 @@ class BettingApp:
         self.refresh_dashboard()
 
     def refresh_dashboard(self):
+        """
+        Ce face:
+            Recalculeaza si actualizeaza cardurile de statistici si lista pariurilor
+            recente (ultimele 5 pariuri si acumulatori, coloreaza win/lose).
+
+        Variabile:
+            bets / accs: pariurile si acumulatorii.
+            finished_bets / finished_accs / all_finished: intrarile finalizate.
+            total_profit / total_staked / wins / win_rate / roi: agregatele.
+
+        Erori:
+            Win rate si ROI sunt 0 cand nu exista intrari finalizate, respectiv
+            cand miza totala e 0 (evita impartirea la 0).
+        """
         bets = tracker.get_all_bets()
         accs = accumulator_tracker.get_all()
 
@@ -238,6 +369,23 @@ class BettingApp:
 
     # ── PARIURI ─────────────────────────────────────────────────
     def build_pariuri(self, frame):
+        """
+        Ce face:
+            Construieste pagina Pariuri: panoul stang pentru compunerea unui bilet
+            (meci, cota, tip, miza, castig potential) si panoul drept cu lista
+            pariurilor salvate si butoanele de actiune (win/lose/sterge/refresh).
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.entry_match / self.entry_odds / self.entry_stake: campurile de input.
+            self.selected_bet_type: tipul de pariu selectat.
+            self.ticket_listbox: lista meciurilor de pe biletul curent.
+            self.bets_listbox: lista pariurilor salvate.
+            self.bet_matches: meciurile adaugate pe biletul curent.
+
+        Erori:
+            La final apeleaza refresh_bets, care poate propaga erori de incarcare.
+        """
         left = tk.Frame(frame, bg=CARD_BG, width=370,
                         highlightthickness=1, highlightbackground=BORDER)
         left.pack(side="left", fill="y", padx=(20,10), pady=20)
@@ -329,6 +477,21 @@ class BettingApp:
         self.refresh_bets()
 
     def update_potential(self, event=None):
+        """
+        Ce face:
+            Recalculeaza si afiseaza castigul potential al biletului pe baza mizei
+            introduse si a cotelor meciurilor de pe bilet.
+
+        Variabile:
+            event: evenimentul de tastatura (optional, ignorat).
+            stake: miza citita din camp.
+            total_odds: cota totala a biletului.
+            potential: castigul potential net.
+
+        Erori:
+            Orice eroare de conversie (miza necompletata/invalida) este prinsa si
+            afiseaza "Castig potential: —".
+        """
         try:
             stake = float(self.entry_stake.get())
             total_odds = 1
@@ -340,6 +503,19 @@ class BettingApp:
             self.label_potential.config(text="Câștig potențial: —")
 
     def add_match_to_ticket(self):
+        """
+        Ce face:
+            Adauga meciul si cota din campuri pe biletul curent, actualizeaza lista
+            biletului, tipul (simplu/acumulator) si castigul potential.
+
+        Variabile:
+            match: numele meciului din camp.
+            odds: cota din camp (convertita in float).
+
+        Erori:
+            Daca meciul sau cota lipsesc afiseaza un avertisment si iese. Daca cota
+            nu este numar afiseaza o eroare si iese.
+        """
         match = self.entry_match.get().strip()
         odds  = self.entry_odds.get().strip()
         if not match or not odds:
@@ -359,13 +535,30 @@ class BettingApp:
         self.update_potential()
 
     def open_bet_builder(self):
+        """
+        Ce face:
+            Deschide o fereastra "Bet Builder" cu categorii de selectii (Final,
+            Sansa Dubla, GG/NGG, Total Goluri, Total Cornere) si campuri de cota.
+            La confirmare adauga selectia ca un meci pe biletul curent.
+
+        Variabile:
+            win: fereastra Toplevel.
+            selectii: dictionar cheie -> (variabila selectie, variabila cota, text afisat).
+            make_cat_simple / make_cat_table: functii interne care construiesc
+                categoriile de tip simplu, respectiv tabelar (Sub/Peste).
+            entry_meci / entry_cota: campurile pentru meci si cota totala.
+            update_preview / adauga: functii interne pentru previzualizare si adaugare.
+
+        Erori:
+            La adaugare, daca meciul lipseste, cota totala e invalida sau nu exista
+            nicio selectie, afiseaza avertisment/eroare si nu adauga nimic.
+        """
         win = tk.Toplevel(self.root)
         win.geometry("650x780")
         win.configure(bg=BG)
         win.resizable(False, False)
         win.overrideredirect(True)
 
-        # titlebar custom identic cu main window
         titlebar = tk.Frame(win, bg="#0a0a0a", height=32)
         titlebar.pack(fill="x", side="top")
         titlebar.pack_propagate(False)
@@ -382,7 +575,6 @@ class BettingApp:
         titlebar.bind("<ButtonPress-1>", start_drag)
         titlebar.bind("<B1-Motion>", do_drag)
 
-        # meci — full width
         meci_inner = tk.Frame(win, bg=CARD_BG)
         meci_inner.pack(fill="x")
         styled_label(meci_inner, "Meci:", color=TEXT_MUTED, size=10).pack(side="left", padx=15, pady=10)
@@ -391,7 +583,6 @@ class BettingApp:
         if self.entry_match.get().strip():
             entry_meci.insert(0, self.entry_match.get().strip())
 
-        # scroll area — fara padx
         outer = tk.Frame(win, bg=BG)
         outer.pack(fill="both", expand=True)
         canvas = tk.Canvas(outer, bg=BG, highlightthickness=0)
@@ -490,7 +681,6 @@ class BettingApp:
         make_cat_table("Total Goluri", [0.5, 1.5, 2.5, 3.5, 4.5])
         make_cat_table("Total Cornere", [7.5, 8.5, 9.5, 10.5])
 
-        # bottom — full width, fara padx
         bot = tk.Frame(win, bg=CARD_BG)
         bot.pack(fill="x")
         preview = tk.Label(bot, text="  Nicio selecție", bg=CARD_BG, fg=TEXT_MUTED,
@@ -535,6 +725,19 @@ class BettingApp:
                       color=CARD_BG, text_color=TEXT_MUTED).pack(fill="x")
 
     def save_ticket(self):
+        """
+        Ce face:
+            Salveaza biletul curent: ca pariu simplu daca are un singur meci, altfel
+            ca acumulator. Apoi reseteaza formularul si reimprospateaza listele.
+
+        Variabile:
+            stake: miza citita din camp.
+            matches / odds_list / match_types: componentele acumulatorului.
+
+        Erori:
+            Daca nu exista niciun meci afiseaza avertisment. Daca miza nu este numar
+            afiseaza eroare si iese fara a salva.
+        """
         if not self.bet_matches:
             messagebox.showwarning("Atenție", "Adaugă cel puțin un meci!")
             return
@@ -557,6 +760,17 @@ class BettingApp:
         self.refresh_dashboard()
 
     def reset_ticket(self):
+        """
+        Ce face:
+            Goleste biletul curent: reseteaza lista de meciuri, campurile si
+            etichetele de tip si castig potential.
+
+        Variabile:
+            self.bet_matches: lista meciurilor, resetata la gol.
+
+        Erori:
+            Nu ridica erori proprii.
+        """
         self.bet_matches = []
         self.ticket_listbox.delete(0, "end")
         self.entry_match.delete(0, "end")
@@ -566,6 +780,19 @@ class BettingApp:
         self.label_potential.config(text="Câștig potențial: —")
 
     def refresh_bets(self):
+        """
+        Ce face:
+            Reconstruieste lista pariurilor nefinalizate: pariurile simple cu
+            prefix [S<index>] si acumulatorii cu prefix [A<index>], cu meciurile
+            lor detaliate (pliabile), colorate dupa rezultatul fiecarui meci.
+
+        Variabile:
+            bets / accs: pariurile si acumulatorii.
+            collapsed / arrow: starea de pliere si sageata afisata pentru acumulator.
+
+        Erori:
+            Propaga erorile de incarcare a datelor.
+        """
         self.bets_listbox.delete(0, "end")
         bets = tracker.get_all_bets()
         for i, b in enumerate(bets):
@@ -601,6 +828,19 @@ class BettingApp:
             self.bets_listbox.insert("end", "")
 
     def _toggle_accumulator(self, event):
+        """
+        Ce face:
+            La dublu-click pe linia unui acumulator, comuta starea de pliere
+            (extins/pliat) si reimprospateaza lista.
+
+        Variabile:
+            event: evenimentul de dublu-click.
+            selection: linia selectata.
+            acc_index: indexul acumulatorului extras din text.
+
+        Erori:
+            Daca nu exista selectie sau linia nu este un acumulator, iese fara efect.
+        """
         selection = self.bets_listbox.curselection()
         if not selection:
             return
@@ -614,6 +854,22 @@ class BettingApp:
             self.refresh_bets()
 
     def set_result(self, result):
+        """
+        Ce face:
+            Seteaza rezultatul pentru elementul selectat din lista de pariuri:
+            un meci individual dintr-un acumulator (linia ↳), un pariu simplu [S]
+            sau un acumulator intreg [A]. Apoi reimprospateaza listele.
+
+        Variabile:
+            result: rezultatul de setat ("win" / "lose").
+            selection / item / stripped: selectia curenta si textul ei.
+            acc_index / match_index: indexii deduse pentru meciul din acumulator.
+            prefix / index: tipul (S/A) si indexul liniei principale.
+
+        Erori:
+            Daca nu exista selectie sau linia nu e valida afiseaza avertisment.
+            Daca acumulatorul nu este gasit afiseaza avertisment si iese.
+        """
         selection = self.bets_listbox.curselection()
         if not selection:
             messagebox.showwarning("Atenție", "Selectează un pariu!")
@@ -655,6 +911,19 @@ class BettingApp:
         self.refresh_dashboard()
 
     def delete_bet_gui(self):
+        """
+        Ce face:
+            Sterge, dupa confirmare, pariul simplu [S] sau acumulatorul [A]
+            corespunzator liniei principale selectate, apoi reimprospateaza listele.
+
+        Variabile:
+            selection / item / stripped: selectia curenta si textul ei.
+            prefix / index: tipul (S/A) si indexul liniei principale.
+
+        Erori:
+            Daca nu exista selectie sau linia nu e o linie principala afiseaza
+            avertisment si iese fara a sterge.
+        """
         selection = self.bets_listbox.curselection()
         if not selection:
             messagebox.showwarning("Atenție", "Selectează un pariu!")
@@ -676,6 +945,23 @@ class BettingApp:
 
     # ── MECIURI ─────────────────────────────────────────────────
     def build_meciuri(self, frame):
+        """
+        Ce face:
+            Construieste pagina Meciuri: panoul stang pentru cautarea meciurilor
+            viitoare pe liga si adaugarea lor pe bilet; panoul drept pentru
+            predictia unui meci (selectie liga/echipe, calcul, statistici).
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.leagues_list: lista (nume, cod) a ligilor.
+            self.selected_league / self.selected_pred_league: ligile selectate.
+            self.matches_listbox: lista meciurilor gasite.
+            self.dropdown_home / self.dropdown_away: selectoarele de echipe.
+            self.prediction_text: zona de text pentru predictie.
+
+        Erori:
+            Nu ridica erori proprii; actiunile legate propaga erorile lor.
+        """
         left = tk.Frame(frame, bg=CARD_BG, width=380,
                         highlightthickness=1, highlightbackground=BORDER)
         left.pack(side="left", fill="y", padx=(20,10), pady=20)
@@ -762,6 +1048,22 @@ class BettingApp:
         self.prediction_text.pack(fill="both", expand=True)
 
     def show_detailed_stats(self):
+        """
+        Ce face:
+            Deschide o fereastra cu statistici detaliate pentru meciul selectat.
+            Permite incarcarea separata a fiecarei echipe (din cauza limitei API)
+            si, cand ambele sunt incarcate, afiseaza si statisticile combinate.
+
+        Variabile:
+            home_name / away_name: numele echipelor selectate.
+            home_id / away_id: id-urile echipelor.
+            self._home_stats / self._away_stats: statisticile incarcate.
+            load_home / load_away / show_combined: functii interne de incarcare/afisare.
+
+        Erori:
+            Daca echipele nu sunt incarcate sau sunt identice afiseaza avertisment
+            si iese. Propaga erorile de retea la incarcarea statisticilor.
+        """
         home_name = self.selected_home.get()
         away_name = self.selected_away.get()
 
@@ -842,6 +1144,19 @@ class BettingApp:
                       load_away, color=CARD_BG, text_color=ACCENT).pack(side="left")
 
     def load_matches(self):
+        """
+        Ce face:
+            Incarca si afiseaza meciurile viitoare pentru liga selectata in panoul
+            de cautare.
+
+        Variabile:
+            code: codul ligii selectate.
+            matches: meciurile returnate de API.
+            self.loaded_matches: meciurile pastrate pentru adaugare ulterioara.
+
+        Erori:
+            Propaga erorile de retea din API.
+        """
         from repository.api_repo import get_upcoming_matches
         code = dict(self.leagues_list)[self.selected_league.get()]
         self.matches_listbox.delete(0, "end")
@@ -854,6 +1169,18 @@ class BettingApp:
             self.matches_listbox.insert("end", f"  {m}")
 
     def add_match_from_list(self):
+        """
+        Ce face:
+            Preia meciul selectat din lista de meciuri viitoare, il pune in campul
+            de meci de pe pagina Pariuri si comuta la acea pagina.
+
+        Variabile:
+            selection: linia selectata.
+            match_str: numele meciului extras din text.
+
+        Erori:
+            Daca nu exista selectie afiseaza avertisment si iese.
+        """
         selection = self.matches_listbox.curselection()
         if not selection:
             messagebox.showwarning("Atenție", "Selectează un meci!")
@@ -865,6 +1192,21 @@ class BettingApp:
         messagebox.showinfo("✅", f"Meci adăugat:\n{match_str}\nIntroduce cota și miza!")
 
     def load_teams_for_prediction(self):
+        """
+        Ce face:
+            Incarca echipele ligii selectate pentru predictie si populeaza cele
+            doua dropdown-uri (gazda si oaspete).
+
+        Variabile:
+            code: codul ligii selectate.
+            self.teams_dict: dictionarul {nume: id} al echipelor.
+            team_names: numele echipelor.
+            menu_home / menu_away: meniurile dropdown-urilor.
+
+        Erori:
+            Ridica IndexError daca liga are mai putin de 2 echipe. Propaga erorile
+            de retea din API.
+        """
         from repository.api_repo import get_teams
         code = dict(self.leagues_list)[self.selected_pred_league.get()]
         self.prediction_text.delete("1.0", "end")
@@ -886,6 +1228,21 @@ class BettingApp:
         self.prediction_text.insert("end", f"✅ Încărcate {len(team_names)} echipe!\n")
 
     def calculate_prediction(self):
+        """
+        Ce face:
+            Calculeaza predictia pentru meciul dintre echipele selectate si afiseaza
+            rezultatul in zona de text.
+
+        Variabile:
+            home_name / away_name: numele echipelor selectate.
+            code: codul ligii.
+            home_id / away_id: id-urile echipelor.
+            result: textul predictiei.
+
+        Erori:
+            Daca echipele nu sunt incarcate sau sunt identice afiseaza avertisment
+            si iese. Propaga erorile de retea din calculul predictiei.
+        """
         from business.predictor import predict_match
         home_name = self.selected_home.get()
         away_name = self.selected_away.get()
@@ -907,6 +1264,18 @@ class BettingApp:
 
     # ── GRAFIC ──────────────────────────────────────────────────
     def build_grafic(self, frame):
+        """
+        Ce face:
+            Construieste pagina Grafic: un card informativ cu un buton care
+            deschide graficul de profit intr-o fereastra separata.
+
+        Variabile:
+            frame: frame-ul paginii.
+            card: containerul cardului.
+
+        Erori:
+            Nu ridica erori proprii; afisarea graficului propaga erorile matplotlib.
+        """
         tk.Label(frame, text="", bg=BG).pack(pady=40)
         section_title(frame, "Grafic Profit").pack(fill="x", padx=30)
 
@@ -929,6 +1298,19 @@ class BettingApp:
 
     # ── VALUE BET ───────────────────────────────────────────────
     def build_value(self, frame):
+        """
+        Ce face:
+            Construieste pagina Value Bet: campurile de input (probabilitate, cota,
+            miza) cu placeholder-e si butonul de calcul.
+
+        Variabile:
+            frame: frame-ul paginii.
+            fields: definitiile campurilor (eticheta, atribut, placeholder).
+            self.value_result: eticheta unde se afiseaza rezultatul.
+
+        Erori:
+            Nu ridica erori proprii.
+        """
         tk.Label(frame, text="", bg=BG).pack(pady=20)
         section_title(frame, "Value Bet Calculator").pack(fill="x", padx=30)
 
@@ -957,6 +1339,21 @@ class BettingApp:
         self.value_result.pack(pady=20, padx=30, anchor="w")
 
     def calculate_value(self):
+        """
+        Ce face:
+            Calculeaza probabilitatea implicita, value-ul si valoarea asteptata (EV)
+            pe baza campurilor si afiseaza rezultatul cu verdict si culoare.
+
+        Variabile:
+            prob / odds / stake: valorile citite din campuri.
+            implied: probabilitatea implicita a cotei.
+            value / is_v: diferenta de value si daca pariul are value.
+            ev: valoarea asteptata.
+            color / verdict: culoarea si textul verdictului.
+
+        Erori:
+            Daca vreun camp nu este numar valid afiseaza eroare si iese.
+        """
         from business.calculator import odds_to_probability, has_value, expected_value
         try:
             prob  = float(self.entry_prob.get())
@@ -980,6 +1377,21 @@ class BettingApp:
 
     # ── BANK ────────────────────────────────────────────────────
     def build_bank(self, frame):
+        """
+        Ce face:
+            Construieste pagina Bank: setarea bugetului initial, adaugarea de
+            fonduri, cardurile cu buget initial/curent/profit si butonul de refresh
+            care afiseaza si graficul evolutiei bankului.
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.entry_buget / self.entry_adauga: campurile de input.
+            self.bank_labels: etichetele valorilor bankului, pe cheie.
+            bank_stats: definitiile cardurilor.
+
+        Erori:
+            La final apeleaza refresh_bank, care poate propaga erori de incarcare.
+        """
         header = tk.Frame(frame, bg=BG)
         header.pack(fill="x", padx=30, pady=(25,10))
         styled_label(header, "Bank Management", 20, bold=True, color=TEXT).pack(side="left")
@@ -1030,6 +1442,18 @@ class BettingApp:
         self.refresh_bank()
 
     def adauga_fonduri(self):
+        """
+        Ce face:
+            Adauga suma introdusa la bugetul initial din bank, salveaza si
+            reimprospateaza pagina.
+
+        Variabile:
+            suma: valoarea de adaugat (float).
+            data: datele curente ale bankului.
+
+        Erori:
+            Daca suma nu este numar valid afiseaza eroare si nu modifica nimic.
+        """
         from repository.bank_repo import load_bank, save_bank
         try:
             suma = float(self.entry_adauga.get())
@@ -1043,6 +1467,16 @@ class BettingApp:
             messagebox.showerror("Eroare", "Introdu un număr valid!")
 
     def save_buget(self):
+        """
+        Ce face:
+            Seteaza bugetul initial cu valoarea din camp si reimprospateaza pagina.
+
+        Variabile:
+            suma: bugetul initial introdus (float).
+
+        Erori:
+            Daca suma nu este numar valid afiseaza eroare si nu modifica nimic.
+        """
         from business.bank_manager import set_buget_initial
         try:
             suma = float(self.entry_buget.get())
@@ -1053,6 +1487,19 @@ class BettingApp:
             messagebox.showerror("Eroare", "Introdu un număr valid!")
 
     def refresh_bank(self):
+        """
+        Ce face:
+            Actualizeaza cardurile bankului (initial/curent/profit) si, daca exista
+            cel putin doua puncte de evolutie, deseneaza graficul evolutiei bankului.
+
+        Variabile:
+            status: dictionarul cu bugetul initial, curent si profitul.
+            valori / labels: seria de valori a bankului si etichetele.
+
+        Erori:
+            Daca exista mai putin de 2 puncte iese fara grafic. Propaga erorile
+            matplotlib de afisare.
+        """
         from business.bank_manager import get_status, get_evolutie
         import matplotlib.pyplot as plt
 
@@ -1088,6 +1535,20 @@ class BettingApp:
 
     # ── ISTORIC ─────────────────────────────────────────────────
     def build_istoric(self, frame):
+        """
+        Ce face:
+            Construieste pagina Istoric: filtre (dupa rezultat si tip), zona de
+            sumar, lista pariurilor finalizate si butoanele de setare a rezultatului.
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.filter_result / self.filter_type: variabilele de filtrare.
+            self.istoric_sumar: containerul cardurilor de sumar.
+            self.istoric_listbox: lista intrarilor din istoric.
+
+        Erori:
+            La final apeleaza refresh_istoric, care poate propaga erori de incarcare.
+        """
         header = tk.Frame(frame, bg=BG)
         header.pack(fill="x", padx=30, pady=(25, 10))
         styled_label(header, "Istoric Pariuri", 20, bold=True, color=TEXT).pack(side="left")
@@ -1148,6 +1609,21 @@ class BettingApp:
         self.refresh_istoric()
 
     def set_result_istoric(self, result):
+        """
+        Ce face:
+            Seteaza rezultatul pentru elementul selectat in istoric: un meci dintr-un
+            acumulator (linia ↳), un pariu simplu [S] sau un acumulator [A]. Indexii
+            sunt extrasi din text cu expresii regulate. Apoi reimprospateaza.
+
+        Variabile:
+            result: rezultatul de setat ("win" / "lose").
+            selection / item: selectia curenta si textul ei.
+            acc_index / match_index / idx: indexii deduse din text.
+
+        Erori:
+            Daca nu exista selectie, linia e un separator sau nu se identifica
+            pariul/acumulatorul, afiseaza avertisment si iese.
+        """
         import re
         selection = self.istoric_listbox.curselection()
         if not selection:
@@ -1159,7 +1635,6 @@ class BettingApp:
             messagebox.showwarning("Atenție", "Selectează un pariu sau meci!")
             return
 
-        # cazul liniei ↳ din acumulator — contine [Ax] embedded
         if item.startswith("↳"):
             match = re.search(r'\[A(\d+)\]', item)
             if not match:
@@ -1167,7 +1642,6 @@ class BettingApp:
                 return
             acc_index = int(match.group(1))
 
-            # calculeaza match_index numarand liniile ↳ de la linia principala
             match_index = 0
             for row in range(selection[0] - 1, -1, -1):
                 line = self.istoric_listbox.get(row).strip()
@@ -1180,7 +1654,6 @@ class BettingApp:
             self.refresh_dashboard()
             return
 
-        # cazul liniei principale simplu — contine [Sx] embedded
         s_match = re.search(r'\[S(\d+)\]', item)
         if s_match:
             idx = int(s_match.group(1))
@@ -1190,7 +1663,6 @@ class BettingApp:
             messagebox.showinfo("✅", f"Rezultat actualizat: {result}!")
             return
 
-        # cazul liniei principale acumulator — contine [Ax] embedded
         a_match = re.search(r'\[A(\d+)\]', item)
         if a_match:
             idx = int(a_match.group(1))
@@ -1203,6 +1675,23 @@ class BettingApp:
         messagebox.showwarning("Atenție", "Nu s-a găsit pariul!")
 
     def refresh_istoric(self):
+        """
+        Ce face:
+            Reconstruieste istoricul: aplica filtrele de rezultat si tip, aduna
+            pariurile simple si acumulatorii finalizati, calculeaza sumarul (total,
+            castigate, win rate, profit), sorteaza descrescator dupa data si
+            afiseaza fiecare intrare cu indexul ei ([Sx]/[Ax]) si meciurile detaliate.
+
+        Variabile:
+            bets / accs: pariurile si acumulatorii.
+            f_result / f_type: filtrele selectate.
+            entries: intrarile filtrate si normalizate.
+            total_profit / wins / win_rate: agregatele pentru sumar.
+
+        Erori:
+            Daca nu exista intrari, sumarul nu se afiseaza. Propaga erorile de
+            incarcare a datelor.
+        """
         for w in self.istoric_sumar.winfo_children():
             w.destroy()
 
@@ -1260,7 +1749,6 @@ class BettingApp:
 
         entries.sort(key=lambda e: e["date"], reverse=True)
 
-        # sumar
         if entries:
             total_profit = round(sum(e["profit"] for e in entries), 2)
             wins         = sum(1 for e in entries if e["result"] == "win")
@@ -1282,7 +1770,6 @@ class BettingApp:
                     color = ACCENT if total_profit >= 0 else RED
                 styled_label(c, value, size=13, bold=True, color=color).pack(padx=10, pady=(0, 8))
 
-        # afiseaza — includem real_index in linie ca [Sx] sau [Ax]
         for e in entries:
             icon = "✅" if e["result"] == "win" else "❌"
             idx  = e["real_index"]
@@ -1314,6 +1801,18 @@ class BettingApp:
 
     # ── ANALIZĂ TIP ─────────────────────────────────────────────
     def build_analiza(self, frame):
+        """
+        Ce face:
+            Construieste pagina Analiza pe Tip Pariu: antetul cu buton de refresh si
+            containerul in care refresh_analiza deseneaza cardurile pe tip.
+
+        Variabile:
+            frame: frame-ul paginii.
+            self.analiza_frame: containerul cardurilor de analiza.
+
+        Erori:
+            La final apeleaza refresh_analiza, care poate propaga erori de incarcare.
+        """
         header = tk.Frame(frame, bg=BG)
         header.pack(fill="x", padx=30, pady=(25,10))
         styled_label(header, "Analiză pe Tip Pariu", 20, bold=True, color=TEXT).pack(side="left")
@@ -1325,6 +1824,21 @@ class BettingApp:
         self.refresh_analiza()
 
     def show_weekly_summary(self):
+        """
+        Ce face:
+            Afiseaza fereastra cu rezumatul saptamanal: statistici, evolutia
+            bankului, cel mai bun si cel mai rau pariu. Marcheaza rezumatul ca
+            aratat astazi.
+
+        Variabile:
+            summary: datele rezumatului (din get_weekly_summary).
+            win: fereastra Toplevel.
+            stats: cardurile de statistici.
+
+        Erori:
+            Daca nu exista date de rezumat (summary None) iese fara a deschide
+            fereastra.
+        """
         from business.weekly_summary import get_weekly_summary, mark_summary_shown
         mark_summary_shown()
 
@@ -1402,6 +1916,21 @@ class BettingApp:
         styled_button(win, "✅ Închide", win.destroy).pack(pady=15, padx=20, fill="x")
 
     def refresh_analiza(self):
+        """
+        Ce face:
+            Reconstruieste cardurile de analiza pe tip de pariu: pentru fiecare tip
+            afiseaza total, castigate, win rate, profit, ROI si o bara de win rate,
+            evidentiind tipul cel mai profitabil.
+
+        Variabile:
+            stats: statisticile pe tip (din get_stats_by_type).
+            has_data: True daca exista cel putin un tip cu date.
+            best_type / best_profit: tipul cu cel mai mare profit.
+            is_best: True pentru cardul evidentiat.
+
+        Erori:
+            Daca nu exista date finalizate afiseaza un mesaj informativ si iese.
+        """
         from business.type_analyzer import get_stats_by_type
 
         for widget in self.analiza_frame.winfo_children():
@@ -1481,6 +2010,18 @@ class BettingApp:
 
 
 def run():
+    """
+    Ce face:
+        Punctul de intrare al interfetei grafice: creeaza fereastra radacina,
+        instantiaza aplicatia si porneste bucla principala Tk.
+
+    Variabile:
+        root: fereastra Tk radacina.
+        app: instanta BettingApp.
+
+    Erori:
+        Ridica TclError daca nu exista un mediu grafic disponibil.
+    """
     root = tk.Tk()
     app  = BettingApp(root)
     root.mainloop()

@@ -3,10 +3,29 @@ from repository import file_repo, accumulator_repo
 BET_TYPES = ["1X2", "Peste/Sub", "BTTS"]
 
 def get_stats_by_type():
+    """
+    Ce face:
+        Calculeaza statistici grupate pe tipul de pariu (1X2, Peste/Sub, BTTS),
+        luand in considerare atat pariurile simple finalizate cu tip specificat,
+        cat si meciurile individuale din acumulatori. Meciurile din acumulatori
+        sunt normalizate la miza 1 pentru comparabilitate.
+
+    Variabile:
+        bets: pariurile simple.
+        accs: acumulatorii.
+        all_entries: lista unificata de intrari cu type/result/odds/stake/profit.
+        stats: dictionarul rezultat, cheie = tip pariu, valoare = statistici sau None.
+        type_entries: intrarile pentru un tip anume.
+        wins / total_profit / total_staked / win_rate / roi: agregatele per tip.
+
+    Erori:
+        Pentru un tip fara intrari valoarea din stats este None. ROI-ul este 0
+        cand total_staked este 0 (evita impartirea la 0). Propaga erorile de
+        incarcare a fisierelor.
+    """
     bets = file_repo.load_bets()
     accs = accumulator_repo.load_accumulators()
 
-    # pariuri simple finalizate cu tip
     all_entries = []
     for b in bets:
         if b.result is not None and b.bet_type is not None:
@@ -18,7 +37,6 @@ def get_stats_by_type():
                 "profit": b.profit
             })
 
-    # meciuri individuale din acumulatori
     for a in accs:
         for i, (match, odds, result, bet_type) in enumerate(zip(
             a.matches, a.odds_list, a.match_results, a.match_types
@@ -29,7 +47,7 @@ def get_stats_by_type():
                     "type":   bet_type,
                     "result": result,
                     "odds":   odds,
-                    "stake":  1,  # normalizat
+                    "stake":  1,
                     "profit": profit
                 })
 
